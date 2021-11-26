@@ -1,0 +1,43 @@
+server:
+  port: 5555
+spring:
+  application:
+    name: gateway
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enable: true
+          lowerCaseServiceId: true
+      routes:
+        - id: apply-service
+          uri: lb://apply-service
+          predicates:
+            - Path=/apply/**
+          filters:
+            - StripPrefix=1
+        - id: apply-service
+          uri: lb://eureka-demo-service
+          predicates:
+            - Path=/test/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:5666/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
